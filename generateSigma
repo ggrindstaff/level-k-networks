@@ -1,0 +1,16 @@
+generateSigma (List,ZZ) := (EPListSorted,nLeaves) -> (
+    numV := #(unique flatten  EPListSorted);
+    leafList := EPListSorted_{0..nLeaves-1};
+    edgeList := EPListSorted_{nLeaves..#EPListSorted - 1};
+    A := mutableIdentity(R,numV);
+    for i from 0 to numV-1 do A_(i,i) = 0;
+    scan(leafList,pair -> A_(pair_1-1,pair_0-1)=e_pair);
+    scan(edgeList,pair -> (
+	    A_(pair_1-1,pair_0-1) = e_pair;
+	    A_(pair_0-1,pair_1-1) = e_pair;
+	    ));
+    v := transpose matrix{toList (i_1..i_nLeaves)|apply(numV-nLeaves,j -> 0)};
+    sigma = mutableMatrix v;
+    for j from 1 to #EPListSorted do sigma = sigma + (A^j)*(mutableMatrix v);
+    transpose matrix{apply(numRows sigma, j -> sum flatten entries (coefficients sigma_(j,0))_0)}
+    )
